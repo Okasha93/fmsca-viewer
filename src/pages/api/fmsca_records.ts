@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import * as XLSX from "xlsx";
-import axios from "axios";
+import { resolve } from "path";
+import { readFileSync } from "fs";
 
 /**
  * Interface representing the structure of FMCSA data.
@@ -28,12 +29,12 @@ const getFmscaRecords = async (req: NextApiRequest, res: NextApiResponse) => {
   const { page = 1, limit = 10, filterColumn, filterValue } = req.query;
 
   try {
-    // Load the XLSX file from the public directory
-    const response = await axios.get("http://localhost:3000/FMSCA_records.xlsx", {
-      responseType: "arraybuffer",
-    });
-    const data = new Uint8Array(response.data);
-    const workbook = XLSX.read(data, { type: "array" });
+    // Resolve the path to the file in the public directory
+    const filePath = resolve("./public/FMSCA_records.xlsx");
+
+    // Read the file directly from the filesystem
+    const data = readFileSync(filePath);
+    const workbook = XLSX.read(data, { type: "buffer" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json<FMSCAData>(sheet);
 
