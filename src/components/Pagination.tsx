@@ -1,5 +1,5 @@
 import React from 'react';
-import cn from './cn';
+import cn from '../components/cn';
 
 type PaginationProps = {
   totalPages: number;

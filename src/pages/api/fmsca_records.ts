@@ -22,7 +22,7 @@ interface FMSCAData {
 
 // Function to handle the API request
 const getFmscaRecords = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10, filterColumn, filterValue } = req.query;
 
   try {
     // Load the XLSX file from the public directory
@@ -34,10 +34,20 @@ const getFmscaRecords = async (req: NextApiRequest, res: NextApiResponse) => {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json<FMSCAData>(sheet);
 
-    const totalCount = jsonData.length;
+    // Apply filtering on the full dataset
+    const filteredData = filterColumn && filterValue
+      ? jsonData.filter((row) =>
+          row[filterColumn as keyof FMSCAData]
+            ?.toString()
+            .toLowerCase()
+            .includes((filterValue as string).toLowerCase())
+        )
+      : jsonData;
+
+    const totalCount = filteredData.length;
     const start = (parseInt(page as string) - 1) * parseInt(limit as string);
     const end = start + parseInt(limit as string);
-    const paginatedData = jsonData.slice(start, end);
+    const paginatedData = filteredData.slice(start, end);
 
     res.setHeader("x-total-count", totalCount.toString()); // Set the total count in headers
     res.status(200).json(paginatedData);
@@ -46,8 +56,6 @@ const getFmscaRecords = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(500).json({ error: "Failed to fetch data" });
   }
 };
-
-
 
 // Export the function as default
 export default getFmscaRecords;

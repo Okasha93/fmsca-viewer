@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { DataGrid, GridColDef, GridPaginationModel, GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridPaginationModel,
+  GridRenderCellParams,
+  GridFilterModel,
+} from "@mui/x-data-grid";
 import axios from "axios";
 import { Box, CircularProgress, Typography, Button } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -32,20 +38,30 @@ const Viewer = () => {
     pageSize: 10,
     page: 0,
   });
-  const [cachedData, setCachedData] = useState<Record<number, FMSCAData[]>>({});
+  const [filterModel, setFilterModel] = useState<GridFilterModel>({
+    items: [],
+  });
+  const [cachedData, setCachedData] = useState<Record<string, FMSCAData[]>>({});
   const router = useRouter();
 
-  const fetchPageData = async (page: number) => {
-    if (cachedData[page]) {
-      // Return cached data if available
-      return cachedData[page];
+  const fetchPageData = async (page: number, filterColumn?: string, filterValue?: string) => {
+    const cacheKey = `${page}-${filterColumn || ""}-${filterValue || ""}`;
+    if (cachedData[cacheKey]) {
+      return cachedData[cacheKey];
     }
 
     try {
-      const response = await axios.get(`/api/fmsca_records?page=${page + 1}&limit=${paginationModel.pageSize}`);
-      setTotalRowCount(response.headers['x-total-count']);
+      const response = await axios.get("/api/fmsca_records", {
+        params: {
+          page: page + 1,
+          limit: paginationModel.pageSize,
+          filterColumn,
+          filterValue,
+        },
+      });
+      setTotalRowCount(response.headers["x-total-count"]);
       const pageData = response.data;
-      setCachedData((prev) => ({ ...prev, [page]: pageData }));
+      setCachedData((prev) => ({ ...prev, [cacheKey]: pageData }));
       return pageData;
     } catch (error) {
       console.error("Error fetching data", error);
@@ -56,23 +72,32 @@ const Viewer = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const data = await fetchPageData(paginationModel.page);
+      const filterItem = filterModel.items[0];
+      const data = await fetchPageData(
+        paginationModel.page,
+        filterItem?.field,
+        filterItem?.value
+      );
       setRows(data);
       setLoading(false);
 
       // Prefetch the next page's data
       const nextPage = paginationModel.page + 1;
       if (nextPage < Math.ceil(totalRowCount / paginationModel.pageSize)) {
-        fetchPageData(nextPage);
+        fetchPageData(nextPage, filterItem?.field, filterItem?.value);
       }
     };
 
     fetchData();
-  }, [paginationModel]);
+  }, [paginationModel, filterModel]);
 
   const columns: GridColDef[] = [
-    { field: "created_dt", headerName: "Created Date", width: 200 },
-    { field: "data_source_modified_dt", headerName: "Modified Date", width: 200 },
+    { field: "created_dt", headerName: "Created Date", width: 220 },
+    {
+      field: "data_source_modified_dt",
+      headerName: "Modified Date",
+      width: 220,
+    },
     { field: "entity_type", headerName: "Entity Type", width: 150 },
     { field: "legal_name", headerName: "Legal Name", width: 200 },
     { field: "dba_name", headerName: "DBA Name", width: 250 },
@@ -82,7 +107,11 @@ const Viewer = () => {
     { field: "power_units", headerName: "Power Units", width: 150 },
     { field: "mcs_150_form_date", headerName: "MCS-150 Form Date", width: 200 },
     { field: "drivers", headerName: "Drivers", width: 100 },
-    { field: "mcs_150_mileage_year", headerName: "MCS-150 Mileage Year", width: 200 },
+    {
+      field: "mcs_150_mileage_year",
+      headerName: "MCS-150 Mileage Year",
+      width: 200,
+    },
     { field: "credit_score", headerName: "Credit Score", width: 150 },
     { field: "record_status", headerName: "Record Status", width: 150 },
     {
@@ -113,7 +142,17 @@ const Viewer = () => {
         paddingBottom: 10,
       }}
     >
-      <Typography variant="h2" gutterBottom>
+      <Typography
+        variant="h2"
+        gutterBottom
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          marginBottom: 2,
+        }}
+      >
         FMSCA Records
       </Typography>
       <Box sx={{ position: "relative", height: "100%" }}>
@@ -143,6 +182,8 @@ const Viewer = () => {
           paginationMode="server"
           paginationModel={paginationModel}
           onPaginationModelChange={(model) => setPaginationModel(model)}
+          filterModel={filterModel}
+          onFilterModelChange={(model) => setFilterModel(model)}
           sx={{
             bgcolor: "white",
             borderRadius: "10px",
