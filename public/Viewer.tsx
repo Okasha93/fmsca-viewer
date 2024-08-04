@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridPaginationModel, GridRenderCellParams } from "@mui/x-data-grid";
 import axios from "axios";
 import * as XLSX from "xlsx";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography, Button } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 interface FMSCAData {
   created_dt: string;
@@ -24,27 +25,6 @@ interface FMSCAData {
   record_status: string;
 }
 
-const columns: GridColDef[] = [
-  { field: "created_dt", headerName: "Created Date", width: 150 },
-  { field: "data_source_modified_dt", headerName: "Modified Date", width: 150 },
-  { field: "entity_type", headerName: "Entity Type", width: 150 },
-  { field: "legal_name", headerName: "Legal Name", width: 200 },
-  { field: "dba_name", headerName: "DBA Name", width: 200 },
-  { field: "physical_address", headerName: "Physical Address", width: 300 },
-  { field: "phone", headerName: "Phone", width: 150 },
-  { field: "usdot_number", headerName: "USDOT Number", width: 150 },
-  { field: "power_units", headerName: "Power Units", width: 150 },
-  { field: "mcs_150_form_date", headerName: "MCS-150 Form Date", width: 200 },
-  { field: "drivers", headerName: "Drivers", width: 150 },
-  {
-    field: "mcs_150_mileage_year",
-    headerName: "MCS-150 Mileage Year",
-    width: 200,
-  },
-  { field: "credit_score", headerName: "Credit Score", width: 150 },
-  { field: "record_status", headerName: "Record Status", width: 150 },
-];
-
 const Viewer = () => {
   const [rows, setRows] = useState<FMSCAData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +32,7 @@ const Viewer = () => {
     pageSize: 10,
     page: 0,
   });
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,15 +55,47 @@ const Viewer = () => {
     fetchData();
   }, []);
 
+  const columns: GridColDef[] = [
+    { field: "created_dt", headerName: "Created Date", width: 200 },
+    { field: "data_source_modified_dt", headerName: "Modified Date", width: 200 },
+    { field: "entity_type", headerName: "Entity Type", width: 150 },
+    { field: "legal_name", headerName: "Legal Name", width: 200 },
+    { field: "dba_name", headerName: "DBA Name", width: 250 },
+    { field: "physical_address", headerName: "Physical Address", width: 300 },
+    { field: "phone", headerName: "Phone", width: 150 },
+    { field: "usdot_number", headerName: "USDOT Number", width: 150 },
+    { field: "power_units", headerName: "Power Units", width: 150 },
+    { field: "mcs_150_form_date", headerName: "MCS-150 Form Date", width: 200 },
+    { field: "drivers", headerName: "Drivers", width: 100 },
+    { field: "mcs_150_mileage_year", headerName: "MCS-150 Mileage Year", width: 200 },
+    { field: "credit_score", headerName: "Credit Score", width: 150 },
+    { field: "record_status", headerName: "Record Status", width: 150 },
+    {
+      field: "details",
+      headerName: "Details",
+      width: 150,
+      renderCell: (params: GridRenderCellParams) => (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => router.push(`/details/${params.row.id}`)}
+        >
+          View Details
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <Box
       sx={{
-        height: 750,
+        height: 770,
         width: "100%",
         bgcolor: "background.default",
         p: 5,
         boxShadow: 5,
         borderRadius: 2,
+        paddingBottom: 10,
       }}
     >
       {loading ? (
@@ -94,12 +107,12 @@ const Viewer = () => {
             height: "100%",
           }}
         >
-          <CircularProgress />
+          <CircularProgress size={100}/>
         </Box>
       ) : (
         <>
           <Typography variant="h2" gutterBottom>
-            FMSCA Company
+            FMSCA Records
           </Typography>
           <DataGrid
             rows={rows}
@@ -108,16 +121,34 @@ const Viewer = () => {
             onPaginationModelChange={(model) => setPaginationModel(model)}
             sx={{
               bgcolor: "white",
+              borderRadius: "10px",
+              marginBottom: "25px",
+              fontSize: "1.1rem",
+              "& .MuiDataGrid-columnHeaders": {
+                bgcolor: "#E0E0E0",
+                color: "black",
+                fontWeight: "bold",
+                fontSize: "1.3rem",
+                padding: "8px",
+              },
               "& .MuiDataGrid-cell": {
                 color: "primary.main",
+                borderBottom: "1px solid #E0E0E0",
               },
-              "& .MuiDataGrid-columnHeaders": {
-                bgcolor: "secondary.main",
-                color: "black",
+              "& .MuiDataGrid-row:hover": {
+                bgcolor: "#F3F4F6",
               },
-              borderRadius: "15px",
-        marginBottom: "25px",
-
+              "& .MuiDataGrid-row:nth-of-type(even)": {
+                bgcolor: "#F9FAFB",
+              },
+              "& .MuiDataGrid-footerContainer": {
+                bgcolor: "white",
+                borderTop: "1px solid #E0E0E0",
+                justifyContent: "center",
+                "& .MuiTablePagination-root": {
+                  fontSize: "0.875rem",
+                },
+              },
             }}
           />
         </>

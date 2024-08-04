@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { CssBaseline, Container, Typography } from '@mui/material';
+import { CssBaseline, Container } from '@mui/material';
 import ThemeProvider  from "../../public/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -26,10 +26,7 @@ export default function RootLayout({
     <body className={inter.className}>
     <ThemeProvider>
       <CssBaseline />
-      <Container maxWidth="xl" className="pt-5 mt-5 mb-5">
-        {/* <Typography variant="h4" gutterBottom>
-          FMCSA Viewer
-        </Typography> */}
+      <Container maxWidth="xl" className="pt-5 mt-4">
         {children}
       </Container>
       </ThemeProvider>
