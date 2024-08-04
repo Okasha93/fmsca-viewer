@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { DataGrid, GridColDef, GridPaginationModel, GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridPaginationModel,
+  GridRenderCellParams,
+} from "@mui/x-data-grid";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import { Box, CircularProgress, Typography, Button } from "@mui/material";
@@ -56,8 +61,12 @@ const Viewer = () => {
   }, []);
 
   const columns: GridColDef[] = [
-    { field: "created_dt", headerName: "Created Date", width: 200 },
-    { field: "data_source_modified_dt", headerName: "Modified Date", width: 200 },
+    { field: "created_dt", headerName: "Created Date", width: 220 },
+    {
+      field: "data_source_modified_dt",
+      headerName: "Modified Date",
+      width: 220,
+    },
     { field: "entity_type", headerName: "Entity Type", width: 150 },
     { field: "legal_name", headerName: "Legal Name", width: 200 },
     { field: "dba_name", headerName: "DBA Name", width: 250 },
@@ -67,7 +76,11 @@ const Viewer = () => {
     { field: "power_units", headerName: "Power Units", width: 150 },
     { field: "mcs_150_form_date", headerName: "MCS-150 Form Date", width: 200 },
     { field: "drivers", headerName: "Drivers", width: 100 },
-    { field: "mcs_150_mileage_year", headerName: "MCS-150 Mileage Year", width: 200 },
+    {
+      field: "mcs_150_mileage_year",
+      headerName: "MCS-150 Mileage Year",
+      width: 200,
+    },
     { field: "credit_score", headerName: "Credit Score", width: 150 },
     { field: "record_status", headerName: "Record Status", width: 150 },
     {
@@ -107,11 +120,21 @@ const Viewer = () => {
             height: "100%",
           }}
         >
-          <CircularProgress size={100}/>
+          <CircularProgress size={100} />
         </Box>
       ) : (
         <>
-          <Typography variant="h2" gutterBottom>
+          <Typography
+            variant="h2"
+            gutterBottom
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              textAlign: "center",
+              marginBottom: 2,
+            }}
+          >
             FMSCA Records
           </Typography>
           <DataGrid
