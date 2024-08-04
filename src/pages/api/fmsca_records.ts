@@ -2,6 +2,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import * as XLSX from "xlsx";
 import axios from "axios";
 
+/**
+ * Interface representing the structure of FMCSA data.
+ */
 interface FMSCAData {
   id: number;
   created_dt: string;

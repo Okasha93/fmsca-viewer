@@ -12,23 +12,30 @@ import axios from "axios";
 import { Box, CircularProgress, Typography, Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 
+/**
+ * Interface representing the structure of FMCSA data.
+ */
 interface FMSCAData {
   created_dt: string;
   data_source_modified_dt: string;
   entity_type: string;
+  operating_status: string;
   legal_name: string;
   dba_name: string;
   physical_address: string;
   phone: string;
   usdot_number: number;
+  mc_mx_ff_number: number;
   power_units: number;
-  mcs_150_form_date: string | number;
-  drivers: number;
-  mcs_150_mileage_year: string;
-  id: number;
-  credit_score: string;
-  record_status: string;
+  out_of_service_date: string;
 }
+
+/**
+ * Viewer Component
+ * 
+ * This component displays FMCSA records in a DataGrid with server-side pagination and filtering.
+ * It fetches data from an API, handles caching, pagination, and prefetching of data.
+ */
 
 const Viewer = () => {
   const [rows, setRows] = useState<FMSCAData[]>([]);
@@ -91,29 +98,24 @@ const Viewer = () => {
     fetchData();
   }, [paginationModel, filterModel]);
 
+  // Define the columns for the DataGrid
   const columns: GridColDef[] = [
-    { field: "created_dt", headerName: "Created Date", width: 220 },
+    { field: "created_dt", headerName: "Created_DT", width: 220 },
     {
       field: "data_source_modified_dt",
-      headerName: "Modified Date",
+      headerName: "Modifed_DT",
       width: 220,
     },
-    { field: "entity_type", headerName: "Entity Type", width: 150 },
-    { field: "legal_name", headerName: "Legal Name", width: 200 },
-    { field: "dba_name", headerName: "DBA Name", width: 250 },
-    { field: "physical_address", headerName: "Physical Address", width: 300 },
+    { field: "entity_type", headerName: "Entity", width: 150 },
+    { field: "operating_status", headerName: "Operating status", width: 200 },
+    { field: "legal_name", headerName: "Legal name", width: 200 },
+    { field: "dba_name", headerName: "DBA name", width: 250 },
+    { field: "physical_address", headerName: "Physical address", width: 300 },
     { field: "phone", headerName: "Phone", width: 150 },
-    { field: "usdot_number", headerName: "USDOT Number", width: 150 },
-    { field: "power_units", headerName: "Power Units", width: 150 },
-    { field: "mcs_150_form_date", headerName: "MCS-150 Form Date", width: 200 },
-    { field: "drivers", headerName: "Drivers", width: 100 },
-    {
-      field: "mcs_150_mileage_year",
-      headerName: "MCS-150 Mileage Year",
-      width: 200,
-    },
-    { field: "credit_score", headerName: "Credit Score", width: 150 },
-    { field: "record_status", headerName: "Record Status", width: 150 },
+    { field: "usdot_number", headerName: "DOT", width: 150 },
+    { field: "mc_mx_ff_number", headerName: "MC/MX/FF", width: 200 },
+    { field: "power_units", headerName: "Power units", width: 150 },
+    { field: "out_of_service_date", headerName: "Out of service date", width: 200 },
     {
       field: "details",
       headerName: "Details",
@@ -138,7 +140,7 @@ const Viewer = () => {
         bgcolor: "background.default",
         p: 5,
         boxShadow: 5,
-        borderRadius: 2,
+        borderRadius: 3,
         paddingBottom: 10,
       }}
     >

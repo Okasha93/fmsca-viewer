@@ -6,29 +6,39 @@ import axios from "axios";
 import * as XLSX from "xlsx";
 import { Box, Typography, CircularProgress } from "@mui/material";
 
+/**
+ * Interface representing the structure of FMCSA data.
+ */
 interface FMSCAData {
+  id: number;
   created_dt: string;
   data_source_modified_dt: string;
   entity_type: string;
+  operating_status: string;
   legal_name: string;
   dba_name: string;
   physical_address: string;
   phone: string;
   usdot_number: number;
+  mc_mx_ff_number: number;
   power_units: number;
-  mcs_150_form_date: string | number;
-  drivers: number;
-  mcs_150_mileage_year: string;
-  id: number;
-  credit_score: string;
-  record_status: string;
+  out_of_service_date: string;
 }
 
+/**
+ * DetailsPage Component
+ * 
+ * This component displays detailed information about a specific FMCSA record.
+ * The record is fetched from an XLSX file based on the ID passed via the URL.
+ */
 const DetailsPage = () => {
   const { id } = useParams() as { id: string }; // Typecasting to ensure `id` is of type string
   const [record, setRecord] = useState<FMSCAData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Function to fetch the specific FMCSA record based on the ID from the URL.
+   */
   useEffect(() => {
     const fetchRecord = async () => {
       try {
@@ -84,21 +94,24 @@ const DetailsPage = () => {
   }
 
   return (
-    <Box sx={{ p: 5, bgcolor: "white", borderRadius: 2, boxShadow: 5, fontSize: 24 }}>
+    <Box sx={{ p: 10, bgcolor: "#F3F4F6", borderRadius: 2, boxShadow: 5, fontSize: 24 }}>
       <Typography variant="h2" gutterBottom>
-        {record.legal_name} - Details
+        {record.legal_name}
       </Typography>
       <Typography variant="h6" gutterBottom>
-        <strong>Created Date:</strong> {record.created_dt}
+        <strong>Created_DT:</strong> {record.created_dt}
       </Typography>
       <Typography variant="h6" gutterBottom>
-        <strong>Modified Date:</strong> {record.data_source_modified_dt}
+        <strong>Modifed_DT:</strong> {record.data_source_modified_dt}
       </Typography>
       <Typography variant="h6" gutterBottom>
-        <strong>Entity Type:</strong> {record.entity_type}
+        <strong>Entity:</strong> {record.entity_type}
       </Typography>
       <Typography variant="h6" gutterBottom>
-        <strong>DBA Name:</strong> {record.dba_name}
+        <strong>Operating status:</strong> {record.operating_status}
+      </Typography>
+      <Typography variant="h6" gutterBottom>
+        <strong>DBA name:</strong> {record.dba_name}
       </Typography>
       <Typography variant="h6" gutterBottom>
         <strong>Physical Address:</strong> {record.physical_address}
@@ -110,15 +123,15 @@ const DetailsPage = () => {
         <strong>USDOT Number:</strong> {record.usdot_number}
       </Typography>
       <Typography variant="h6" gutterBottom>
+        <strong>MC/MX/FF:</strong> {record.mc_mx_ff_number}
+      </Typography>
+      <Typography variant="h6" gutterBottom>
         <strong>Power Units:</strong> {record.power_units}
       </Typography>
       <Typography variant="h6" gutterBottom>
-        <strong>MCS-150 Form Date:</strong> {record.mcs_150_form_date}
+        <strong>Out of service date:</strong> {record.out_of_service_date}
       </Typography>
-      <Typography variant="h6" gutterBottom>
-        <strong>Drivers:</strong> {record.drivers}
-      </Typography>
-      <Typography variant="h6" gutterBottom>
+      {/* <Typography variant="h6" gutterBottom>
         <strong>MCS-150 Mileage Year:</strong> {record.mcs_150_mileage_year}
       </Typography>
       <Typography variant="h6" gutterBottom>
@@ -126,7 +139,7 @@ const DetailsPage = () => {
       </Typography>
       <Typography variant="h6" gutterBottom>
         <strong>Record Status:</strong> {record.record_status}
-      </Typography>
+      </Typography> */}
     </Box>
   );
 };

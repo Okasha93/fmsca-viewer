@@ -1,6 +1,9 @@
 import React from 'react';
 import cn from '../components/cn';
 
+/**
+ * PaginationProps type definition for the Pagination component.
+ */
 type PaginationProps = {
   totalPages: number;
   currentPage: number;
@@ -11,6 +14,13 @@ type PaginationProps = {
   endIndex: number;
   total: number;
 };
+
+/**
+ * Pagination Component
+ * 
+ * This component renders pagination controls, including buttons for navigating
+ * between pages and a summary of the entries being displayed.
+ */
 
 const Pagination = ({
   totalPages,
