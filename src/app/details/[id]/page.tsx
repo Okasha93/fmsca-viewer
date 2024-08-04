@@ -1,7 +1,7 @@
-import DetailsPage from "../../../../public/Details";
+import DetailsPage from "../../../components/Details";
 
 
-export default function Home() {
+export default function Details() {
   return <DetailsPage />;
 
 }

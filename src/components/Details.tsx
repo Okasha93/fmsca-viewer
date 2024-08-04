@@ -25,7 +25,7 @@ interface FMSCAData {
 }
 
 const DetailsPage = () => {
-  const { id } = useParams(); // Use useParams to get the dynamic route parameter
+  const { id } = useParams() as { id: string }; // Typecasting to ensure `id` is of type string
   const [record, setRecord] = useState<FMSCAData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +39,7 @@ const DetailsPage = () => {
         const workbook = XLSX.read(data, { type: "array" });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json<FMSCAData>(sheet);
-        const recordData = jsonData.find((item) => item.id === parseInt(id as string));
+        const recordData = jsonData.find((item) => item.id === parseInt(id));
         setRecord(recordData || null);
       } catch (error) {
         console.error("Error fetching data", error);
