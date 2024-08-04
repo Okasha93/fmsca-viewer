@@ -71,7 +71,6 @@ const Viewer = () => {
       setCachedData((prev) => ({ ...prev, [cacheKey]: pageData }));
       return pageData;
     } catch (error) {
-      console.error("Error fetching data", error);
       return [];
     }
   };

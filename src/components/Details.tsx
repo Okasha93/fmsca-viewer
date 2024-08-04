@@ -131,15 +131,6 @@ const DetailsPage = () => {
       <Typography variant="h6" gutterBottom>
         <strong>Out of service date:</strong> {record.out_of_service_date}
       </Typography>
-      {/* <Typography variant="h6" gutterBottom>
-        <strong>MCS-150 Mileage Year:</strong> {record.mcs_150_mileage_year}
-      </Typography>
-      <Typography variant="h6" gutterBottom>
-        <strong>Credit Score:</strong> {record.credit_score}
-      </Typography>
-      <Typography variant="h6" gutterBottom>
-        <strong>Record Status:</strong> {record.record_status}
-      </Typography> */}
     </Box>
   );
 };

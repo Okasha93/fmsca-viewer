@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import * as XLSX from "xlsx";
 import { resolve } from "path";
 import { readFileSync } from "fs";
 
@@ -29,24 +28,21 @@ const getFmscaRecords = async (req: NextApiRequest, res: NextApiResponse) => {
   const { page = 1, limit = 10, filterColumn, filterValue } = req.query;
 
   try {
-    // Resolve the path to the file in the public directory
-    const filePath = resolve("./public/FMSCA_records.xlsx");
+    // Resolve the path to the JSON file in the public directory
+    const filePath = resolve("./public/FMSCA_records.json");
 
-    // Read the file directly from the filesystem
-    const data = readFileSync(filePath);
-    const workbook = XLSX.read(data, { type: "buffer" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const jsonData = XLSX.utils.sheet_to_json<FMSCAData>(sheet);
+    // Read the JSON file directly from the filesystem
+    const data = JSON.parse(readFileSync(filePath, 'utf-8')) as FMSCAData[];
 
     // Apply filtering on the full dataset
     const filteredData = filterColumn && filterValue
-      ? jsonData.filter((row) =>
+      ? data.filter((row) =>
           row[filterColumn as keyof FMSCAData]
             ?.toString()
             .toLowerCase()
             .includes((filterValue as string).toLowerCase())
         )
-      : jsonData;
+      : data;
 
     const totalCount = filteredData.length;
     const start = (parseInt(page as string) - 1) * parseInt(limit as string);
@@ -56,7 +52,6 @@ const getFmscaRecords = async (req: NextApiRequest, res: NextApiResponse) => {
     res.setHeader("x-total-count", totalCount.toString()); // Set the total count in headers
     res.status(200).json(paginatedData);
   } catch (error) {
-    console.error("Error fetching data", error);
     res.status(500).json({ error: "Failed to fetch data" });
   }
 };
