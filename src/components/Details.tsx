@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import axios from "axios";
-import * as XLSX from "xlsx";
 import { Box, Typography, CircularProgress } from "@mui/material";
 
 /**
@@ -14,22 +12,22 @@ interface FMSCAData {
   created_dt: string;
   data_source_modified_dt: string;
   entity_type: string;
-  operating_status: string;
+  operating_status?: string;
   legal_name: string;
-  dba_name: string;
+  dba_name?: string;
   physical_address: string;
   phone: string;
   usdot_number: number;
-  mc_mx_ff_number: number;
+  mc_mx_ff_number?: string;
   power_units: number;
-  out_of_service_date: string;
+  out_of_service_date?: string;
 }
 
 /**
  * DetailsPage Component
  * 
  * This component displays detailed information about a specific FMCSA record.
- * The record is fetched from an XLSX file based on the ID passed via the URL.
+ * The record is fetched from a JSON file based on the ID passed via the URL.
  */
 const DetailsPage = () => {
   const { id } = useParams() as { id: string }; // Typecasting to ensure `id` is of type string
@@ -42,14 +40,9 @@ const DetailsPage = () => {
   useEffect(() => {
     const fetchRecord = async () => {
       try {
-        const response = await axios.get("/fmsca_records.xlsx", {
-          responseType: "arraybuffer",
-        });
-        const data = new Uint8Array(response.data);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json<FMSCAData>(sheet);
-        const recordData = jsonData.find((item) => item.id === parseInt(id));
+        const response = await fetch("/FMSCA_records.json");
+        const data: FMSCAData[] = await response.json();
+        const recordData = data.find((item) => item.id === parseInt(id));
         setRecord(recordData || null);
       } catch (error) {
         console.error("Error fetching data", error);
@@ -99,20 +92,24 @@ const DetailsPage = () => {
         {record.legal_name}
       </Typography>
       <Typography variant="h6" gutterBottom>
-        <strong>Created_DT:</strong> {record.created_dt}
+        <strong>Created Date:</strong> {record.created_dt}
       </Typography>
       <Typography variant="h6" gutterBottom>
-        <strong>Modifed_DT:</strong> {record.data_source_modified_dt}
+        <strong>Modified Date:</strong> {record.data_source_modified_dt}
       </Typography>
       <Typography variant="h6" gutterBottom>
-        <strong>Entity:</strong> {record.entity_type}
+        <strong>Entity Type:</strong> {record.entity_type}
       </Typography>
-      <Typography variant="h6" gutterBottom>
-        <strong>Operating status:</strong> {record.operating_status}
-      </Typography>
-      <Typography variant="h6" gutterBottom>
-        <strong>DBA name:</strong> {record.dba_name}
-      </Typography>
+      {record.operating_status && (
+        <Typography variant="h6" gutterBottom>
+          <strong>Operating Status:</strong> {record.operating_status}
+        </Typography>
+      )}
+      {record.dba_name && (
+        <Typography variant="h6" gutterBottom>
+          <strong>DBA Name:</strong> {record.dba_name}
+        </Typography>
+      )}
       <Typography variant="h6" gutterBottom>
         <strong>Physical Address:</strong> {record.physical_address}
       </Typography>
@@ -122,15 +119,19 @@ const DetailsPage = () => {
       <Typography variant="h6" gutterBottom>
         <strong>USDOT Number:</strong> {record.usdot_number}
       </Typography>
-      <Typography variant="h6" gutterBottom>
-        <strong>MC/MX/FF:</strong> {record.mc_mx_ff_number}
-      </Typography>
+      {record.mc_mx_ff_number && (
+        <Typography variant="h6" gutterBottom>
+          <strong>MC/MX/FF Number:</strong> {record.mc_mx_ff_number}
+        </Typography>
+      )}
       <Typography variant="h6" gutterBottom>
         <strong>Power Units:</strong> {record.power_units}
       </Typography>
-      <Typography variant="h6" gutterBottom>
-        <strong>Out of service date:</strong> {record.out_of_service_date}
-      </Typography>
+      {record.out_of_service_date && (
+        <Typography variant="h6" gutterBottom>
+          <strong>Out of Service Date:</strong> {record.out_of_service_date}
+        </Typography>
+      )}
     </Box>
   );
 };
