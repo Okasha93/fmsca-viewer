@@ -134,7 +134,7 @@ const Viewer = () => {
   return (
     <Box
       sx={{
-        height: 770,
+        height: "90vh",
         width: "100%",
         bgcolor: "background.default",
         p: 5,
@@ -143,19 +143,41 @@ const Viewer = () => {
         paddingBottom: 10,
       }}
     >
-      <Typography
-        variant="h2"
-        gutterBottom
+      <Box
         sx={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          textAlign: "center",
-          marginBottom: 2,
+          marginBottom: 4,
+          marginTop: 2,
+          position: "relative",
         }}
       >
-        FMSCA Records
-      </Typography>
+        <Typography
+          variant="h2"
+          gutterBottom
+          sx={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          FMSCA Records
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => router.push("/pivot-table")}
+          sx={{
+            position: "absolute",
+            right: 0,
+          }}
+          size="large"
+        >
+          Pivot Table
+        </Button>
+      </Box>
+      
       <Box sx={{ position: "relative", height: "100%" }}>
         {loading && (
           <Box
